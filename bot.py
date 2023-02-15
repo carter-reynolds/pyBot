@@ -58,10 +58,10 @@ async def on_message(message):
         if argument == 'help':
             
             await message.channel.send(dedent("""
-            To convert a video, simply enter a valid youtube link after !ytmp3. 
+            To convert a video, simply enter a valid youtube link after !mp3. 
             Keep in mind discord has a 8MB file size limit, so anything larger than that will not work.
             
-            Example: ```!ytmp3 https://www.youtube.com/watch?v=dQw4w9WgXcQ```
+            Example: ```!mp3 https://www.youtube.com/watch?v=dQw4w9WgXcQ```
             """))
         
         # if the user entered anything else try to convert the video   
