@@ -1,7 +1,7 @@
 import os
 import discord
 from dotenv import load_dotenv
-from ghettomp3 import grab_mp3
+from mp3 import grab_mp3
 from textwrap import dedent
 import aiohttp
 import asyncio
