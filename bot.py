@@ -23,9 +23,10 @@ client = discord.Client(intents=discord.Intents.all())
 
 # Dictionary of commands
 commands = {
-    "!mp3": "Converts a youtube video to mp3. Type *!mp3 help* for more info.",
+    "!mp3": "Converts a youtube video to mp3 and uploads to channel. Type *!mp3 help* for more info.",
     "!daddy": "Checks if you're daddy.",
     "!dog": "Sends a random dog picture.",
+    "!cat": "Sends a random cat picture.",
     "!help": "Displays all commands.",
 }
 
@@ -106,6 +107,12 @@ async def on_message(message):
         url = await get_dog()
         await message.channel.send(url)
         await message.delete()
+        
+    elif message.content == "!cat":
+        
+        url = await get_cat()
+        await message.channel.send(url)
+        await message.delete()
     
 
 @client.event
@@ -127,6 +134,13 @@ async def get_dog():
         async with session.get(dog_url) as resp:
             dog = await resp.json()
             return dog['url']
+        
+async def get_cat():
+    async with aiohttp.ClientSession() as session:
+        cat_url = 'http://aws.random.cat/meow'
+        async with session.get(cat_url) as resp:
+            cat = await resp.json()
+            return cat['file']
         
 # todo - finish this
 async def get_dank_meme():
