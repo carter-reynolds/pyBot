@@ -95,7 +95,7 @@ async def on_message(message):
         user_id = message.author.id
         
         # get user name from id
-        user = await client.fetch_user(user_id)
+        user = await client.fetch_user(OVERLORD)
         
         if str(user_id) == OVERLORD:
             await message.channel.send("You are daddy!")
