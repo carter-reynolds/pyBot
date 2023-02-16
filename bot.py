@@ -198,9 +198,9 @@ async def on_message(message):
         ## !CAT COMMAND ##
         elif author_msg == "!cat":
 
-        url = await get_cat()
-        await msg_source.send(url)
-        await message.delete()
+            url = await get_cat()
+            await msg_source.send(url)
+            await message.delete()
     
     
 
