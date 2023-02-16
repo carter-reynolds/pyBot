@@ -69,7 +69,7 @@ async def on_message(message):
     # if the message starts with !mp3
     elif message.content.startswith("!mp3"):
         
-        if message.author.id != OVERLORD:
+        if message.author.id not in powerusers:
             # inform the user they don't have permission to use the command
             await message.channel.send("You do not have permission to use this command.")
             return
