@@ -86,6 +86,11 @@ async def on_message(message):
         ## !MP3 COMMAND ##
         elif author_msg.startswith("!mp3"):
             
+            # check if bot is already playing music
+            if len(client.voice_clients) > 0:
+                await msg_source.send("I'm already playing music!")
+                return    
+            
             if author_id not in powerusers:
                 await msg_source.send("You do not have permission to use this command.")
                 return
