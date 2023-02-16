@@ -70,126 +70,133 @@ async def on_message(message):
     argument = author_msg.split(" ")[1:] # get the argument(s) after the command
     msg_source = message.channel
     
-    # don't respond to ourselves
-    if author == bot:
-        return
-
-    ########################################
-    #           COMMANDS                   #
-    ########################################
+    # if the message starts with a !, it's a command
+    if not author_msg.startswith("!"):
+        return # do nothing if it's not a command
     
-    ## !MP3 COMMAND ##
-    elif author_msg.startswith("!mp3"):
+    else: 
         
-        if author_id not in powerusers:
-            await msg_source.send("You do not have permission to use this command.")
-            return
+        if author == bot:
+            return 
 
-        if argument == "help":
-            await msg_source.send(
-                dedent(
-                    """
-                    To convert a video, simply enter a valid youtube link after !mp3. 
-                    Keep in mind discord has a 8MB file size limit, so anything larger than that will not work.
-                    
-                    Example: ```!mp3 https://www.youtube.com/watch?v=dQw4w9WgXcQ```
-                    Example: ```!mp3 Lil Nas X - Old Town Road```
-                    """
-                )
-            )
-        # if no argument is given, send help message ^^^
-        # otherwise, convert the video  
-        else:
+        ########################################
+        #           COMMANDS                   #
+        ########################################
+        
+        ## !MP3 COMMAND ##
+        elif author_msg.startswith("!mp3"):
             
-            if "youtube.com" in argument:
-                await msg_source.send("Converting Youtube video to mp3...")
-            else:
-                await msg_source.send("Searching for video on youtube...")
+            if author_id not in powerusers:
+                await msg_source.send("You do not have permission to use this command.")
+                return
 
-            video_url, video_title = get_mp3_by_title(argument)
-            data = grab_mp3(video_url)                              # DLs the mp3 and returns the file name
-            file_name = data.split(".\\")[1]                        # get the file name and remove path
-            
-             # check if message author is in a voice channel
-            if author.voice is None or "~" in argument:
-                print("User not in a voice channel - sending mp3 file instead.")
-                
-                try:
-                    await msg_source.send(file=discord.File(file_name))  # send the mp3 file
-                    
-                    if author_id not in powerusers:
-                        pass                            # don't delete the command message if daddy
-                    else:
-                        await message.delete()          # delete the command message
+            if argument == "help":
+                await msg_source.send(
+                    dedent(
+                        """
+                        To convert a video, simply enter a valid youtube link after !mp3. 
+                        Keep in mind discord has a 8MB file size limit, so anything larger than that will not work.
                         
-                    os.remove(file_name)                # delete the mp3 file
-
-                except discord.errors.HTTPException:
-                    await msg_source.send("Error: File too large or other issue.")
-                
+                        Example: ```!mp3 https://www.youtube.com/watch?v=dQw4w9WgXcQ```
+                        Example: ```!mp3 Lil Nas X - Old Town Road```
+                        """
+                    )
+                )
+            # if no argument is given, send help message ^^^
+            # otherwise, convert the video  
             else:
-                print("User in a voice channel - playing mp3 in voice channel.")
                 
-                # join the voice channel
-                voice_channel = author.voice.channel
-                voice = await voice_channel.connect()
-                voice.play(discord.FFmpegPCMAudio(executable='codec/ffmpeg.exe', source=file_name))
-
-               
-                # wait for the mp3 to finish playing or user leaves voice channel
-                while voice.is_playing():
-                    
-                    # if user leaves voice channel, stop playing and disconnect
-                    if len(voice_channel.members) == 1:
-                        voice.stop()
-                        break
-                
-                    await asyncio.sleep(1)
-                
-                await voice.disconnect()
-                
-                if author_id not in powerusers:
-                    pass
+                if "youtube.com" in argument:
+                    await msg_source.send("Converting Youtube video to mp3...")
                 else:
-                    await message.delete()
+                    await msg_source.send("Searching for video on youtube...")
+
+                video_url, video_title = get_mp3_by_title(argument)
+                data = grab_mp3(video_url)                              # DLs the mp3 and returns the file name
+                file_name = data.split(".\\")[1]                        # get the file name and remove path
+                
+                # check if message author is in a voice channel
+                if author.voice is None or "~~" in argument:
+                    print("User not in a voice channel - sending mp3 file instead.")
+                    
+                    try:
+                        await msg_source.send(file=discord.File(file_name))  # send the mp3 file
+                        
+                        if author_id in powerusers:
+                            pass                            # don't delete the command message if daddy
+                        else:
+                            await message.delete()          # delete the command message
+                            
+                        os.remove(file_name)                # delete the mp3 file
+
+                    except discord.errors.HTTPException:
+                        await msg_source.send("Error: File too large or other issue.")
+                    
+                else:
+                    print("User in a voice channel - playing mp3 in voice channel.")
+                    
+                    # join the voice channel
+                    voice_channel = author.voice.channel
+                    voice = await voice_channel.connect()
+                    voice.play(discord.FFmpegPCMAudio(executable='codec/ffmpeg.exe', source=file_name))
+
+                
+                    # wait for the mp3 to finish playing or user leaves voice channel
+                    while voice.is_playing():
+                        
+                        # if user leaves voice channel, stop playing and disconnect
+                        if len(voice_channel.members) == 1:
+                            voice.stop()
+                            break
+                    
+                        await asyncio.sleep(1)
+                    
+                    await voice.disconnect()
+                    
+                    if author_id in powerusers:
+                        pass
+                    else:
+                        await message.delete()
+                    
+                    os.remove(file_name)
     
-    
-    ## !HELP COMMAND ##        
-    elif author_msg == "!help":
 
-        help_msg = ""
+        ## !HELP COMMAND ##        
+        elif author_msg == "!help":
 
-        for key, value in commands.items():
-            help_msg += f"**{key}** - {value}\n"
+            help_msg = ""
 
-        await msg_source.send("Help Menu:\n" + help_msg)
+            for key, value in commands.items():
+                help_msg += f"**{key}** - {value}\n"
 
-    
-    ## !DADDY COMMAND ##
-    elif author_msg == "!daddy":
+            await msg_source.send("Help Menu:\n" + help_msg)
 
-        # get the user's id
-        user_id: int = author_id
+        
+        ## !DADDY COMMAND ##
+        elif author_msg == "!daddy":
 
-        # get user name from id
-        user = await client.fetch_user(OVERLORD)
+            # get the user's id
+            user_id: int = author_id
 
-        if user_id == OVERLORD:
-            await msg_source.send("You are daddy!")
-        else:
-            await msg_source.send(f"You are not daddy! {user} is daddy!")
+            # get user name from id
+            user = await client.fetch_user(OVERLORD)
 
-    
-    ## !DOG COMMAND ##
-    elif author_msg == "!dog":
+            if user_id == OVERLORD:
+                await msg_source.send("You are daddy!")
+            else:
+                await msg_source.send(f"You are not daddy! {user} is daddy!")
 
-        url = await get_dog()
-        await msg_source.send(url)
-        await message.delete()
+        
+        ## !DOG COMMAND ##
+        elif author_msg == "!dog":
 
-    
-    ## !CAT COMMAND ##
-    elif author_msg == "!cat":
+            url = await get_dog()
+            await msg_source.send(url)
+            await message.delete()
+
+        
+        ## !CAT COMMAND ##
+        elif author_msg == "!cat":
 
         url = await get_cat()
         await msg_source.send(url)
