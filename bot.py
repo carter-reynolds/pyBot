@@ -116,30 +116,35 @@ async def on_message(message):
                 file_name = data.split(".\\")[1]                        # get the file name and remove path
                 
                 # check if message author is in a voice channel
+                # or if the command is being run with the "~~" argument
                 if author.voice is None or "~~" in argument:
-                    print("User not in a voice channel - sending mp3 file instead.")
                     
                     try:
                         await msg_source.send(file=discord.File(file_name))  # send the mp3 file
+
+                    except discord.errors.HTTPException:
+                        await msg_source.send("Error: File too large or other issue.")
+                        
+                    finally:
+                        os.remove(file_name)                # delete the mp3 file
                         
                         if author_id in powerusers:
                             pass                            # don't delete the command message if daddy
                         else:
                             await message.delete()          # delete the command message
-                            
-                        os.remove(file_name)                # delete the mp3 file
-
-                    except discord.errors.HTTPException:
-                        await msg_source.send("Error: File too large or other issue.")
                     
                 else:
-                    print("User in a voice channel - playing mp3 in voice channel.")
                     
                     # join the voice channel
                     voice_channel = author.voice.channel
                     voice = await voice_channel.connect()
-                    voice.play(discord.FFmpegPCMAudio(executable='codec/ffmpeg.exe', source=file_name))
-
+                    
+                    voice.play(discord.PCMVolumeTransformer(
+                        discord.FFmpegPCMAudio(
+                            executable='codec/ffmpeg.exe', 
+                            source=file_name
+                        ),  volume=0.05
+                    ))
                 
                     # wait for the mp3 to finish playing or user leaves voice channel
                     while voice.is_playing():
@@ -152,11 +157,6 @@ async def on_message(message):
                         await asyncio.sleep(1)
                     
                     await voice.disconnect()
-                    
-                    if author_id in powerusers:
-                        pass
-                    else:
-                        await message.delete()
                     
                     os.remove(file_name)
     
