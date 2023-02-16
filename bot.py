@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from mp3 import grab_mp3
 from textwrap import dedent
-from youtube import get_mp3_by_title
+from youtube import yt_search
 import aiohttp
 import asyncio
 import os
@@ -111,7 +111,7 @@ async def on_message(message):
                 else:
                     await msg_source.send("Searching for video on youtube...")
 
-                video_url, video_title = get_mp3_by_title(argument)
+                video_url, video_title = yt_search(argument)
                 data = grab_mp3(video_url)                              # DLs the mp3 and returns the file name
                 file_name = data.split(".\\")[1]                        # get the file name and remove path
                 

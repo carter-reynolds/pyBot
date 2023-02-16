@@ -7,7 +7,7 @@ load_dotenv()
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
 
-def get_mp3_by_title(title):
+def yt_search(title):
     with build('youtube', 'v3', developerKey=YOUTUBE_API_KEY) as service:
         
         request = service.search().list(
