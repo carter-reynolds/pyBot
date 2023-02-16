@@ -2,3 +2,6 @@
 __pycache__
 .conda
 err.log
+.vscode
+*.mp3
+*.exe
